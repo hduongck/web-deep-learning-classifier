@@ -16,10 +16,21 @@ with open("src/config.yaml", 'r') as stream:
     APP_CONFIG = yaml.load(stream)
 
 app = Flask(__name__)
+path = Path(__file__).parent
 
+export_file_url = 'https://drive.google.com/file/d/1907V4ieruy_M0gYDweNAia1pAIVzMdxC/view?usp=sharing'
+export_file_name = 'model.pkl'
 
-def load_model(path=".", model_name="model.pkl"):
-    learn = load_learner(path, fname=model_name)
+async def download_file(url, dest):
+    if dest.exists(): return
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            data = await response.read()
+            with open(dest, 'wb') as f: f.write(data)
+                
+def load_model():
+    await dowdload_file(export_file_url,path/export_file_name)
+    learn = load_learner(path, export_file_name)
     return learn
 
 
